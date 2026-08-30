@@ -1,0 +1,8 @@
+.DS_Store
+*.swp
+.env
+.venv
+__pycache__/
+*.pyc
+smart_contracts/artifacts/
+out/
