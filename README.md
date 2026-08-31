@@ -78,12 +78,13 @@ Use the TestNet dispenser for fees. Extra escrow above MBR is a payment to the
 app address. `claim` leaves 100_000 µALGO in the account.
 
 
-## LocalNet recreate
 
-Prove the hook compiles and creates on AlgoKit LocalNet. The LocalNet dispenser is free.
-Do **not** copy a LocalNet app id into `docs/deploy.json` or treat Pages as TestNet-live.
-`docs/deploy.json` stays `network: testnet` with `appId: 0` until a real TestNet create.
-LocalNet proof is written to `docs/localnet.json` (separate file; CRT shows it when present).
+## LocalNet recreate (not TestNet)
+
+Create, `set_keeper(Application(...))`, and a mock-keeper inner-call of `check()` were proven on AlgoKit LocalNet (`dockernet-v1`). That is **not** TestNet. Do **not** copy any LocalNet app id into `docs/deploy.json` or Pages. `appId` stays 0 until a real TestNet create.
+
+LocalNet ids are ephemeral (DevMode / reset). They are not a product and they are not for GitHub Pages.
+LocalNet proof for Pages lives in `docs/localnet.json` (CRT shows it when present). `docs/deploy.json` stays honest TestNet `appId: 0`.
 
 ```bash
 # Docker daemon required
@@ -114,19 +115,6 @@ python -m pytest tests/ -q
 puyapy smart_contracts/deadman/contract.py --out-dir smart_contracts/artifacts/deadman --resource-encoding value
 ```
 
-## LocalNet recreate (not TestNet)
-
-Create, `set_keeper(Application(...))`, and a mock-keeper inner-call of `check()` were proven on AlgoKit LocalNet (`dockernet-v1`). That is **not** TestNet. Do **not** copy any LocalNet app id into `docs/deploy.json` or Pages. `appId` stays 0 until a real TestNet create.
-
-```bash
-algokit localnet start
-# algod http://localhost:4001
-# create with ZERO constructor args — do not pass 769891898
-# set_keeper(Application(<local keeper>))  # Application, never itob(keeper id)
-# inner-call check() from the keeper app account
-```
-
-LocalNet ids are ephemeral (DevMode / reset). They are not a product and they are not for GitHub Pages.
 
 ## Layout
 
@@ -135,7 +123,9 @@ smart_contracts/deadman/contract.py   ARC-4 target
 tests/test_hook.py                    static hook / honesty checks
 docs/index.html                       CRT board (ALIVE / TRIPPED / NOT DEPLOYED)
 docs/style.css                        phosphor, flaps
-docs/deploy.json                      {"appId":0,...}  flip the number after deploy
+docs/deploy.json                      {"appId":0,...}  flip after TestNet create
+docs/localnet.json                    LocalNet-only proof (network:localnet)
+scripts/localnet_recreate.py          create on localhost:4001 → localnet.json
 .github/workflows/ci.yml              pytest + puyapy
 .github/workflows/pages.yml           publishes docs/ from main
 LICENSE                               Apache-2.0
