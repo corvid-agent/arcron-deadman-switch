@@ -170,6 +170,18 @@ h1 {
 
 .flap.blank { color: var(--phosphor-dead); text-shadow: none; }
 
+.addr {
+  position: relative;
+  z-index: 1;
+  margin-top: 0.4rem;
+  font-size: clamp(0.7rem, 2.2vw, 0.92rem);
+  letter-spacing: 0.06em;
+  line-height: 1.45;
+  word-break: break-all;
+  text-shadow: var(--glow);
+  min-height: 1.4em;
+}
+
 .notes {
   position: relative;
   z-index: 1;

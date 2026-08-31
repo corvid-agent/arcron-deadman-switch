@@ -4,6 +4,9 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>DEADMAN — NOT DEPLOYED</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Share+Tech+Mono&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./style.css" />
 </head>
 <body>
@@ -16,7 +19,7 @@
     <section class="status-row">
       <div class="label">Board</div>
       <div class="destination grounded" id="headline">NOT DEPLOYED</div>
-      <div class="meta" id="subhead">not deployed</div>
+      <div class="meta" id="subhead">not deployed · keeper 769891898</div>
     </section>
 
     <section class="board">
@@ -42,100 +45,11 @@
       Flip <code>docs/deploy.json</code> <code>appId</code> after TestNet create.
       <code>check()</code> trips a flag; it never inner-pays.
       <code>claim()</code> sends only the surplus above 100_000 µALGO MBR.
-      First-party demo. Not deployed. Unaudited. TestNet only.
+      First-party demo. Not deployed. Unaudited. TestNet only. Keeper
+      <a href="https://testnet.explorer.perawallet.app/application/769891898">769891898</a>.
     </p>
     <p class="err" id="err" hidden></p>
   </main>
-  <script>
-    const INDEXER = "https://testnet-idx.algonode.cloud";
-
-    function flaps(el, text, width) {
-      const s = String(text).padStart(width, " ").slice(-width);
-      el.replaceChildren();
-      for (const ch of s) {
-        const d = document.createElement("span");
-        d.className = "flap" + (ch === " " ? " blank" : "");
-        d.textContent = ch === " " ? "0" : ch;
-        el.appendChild(d);
-      }
-    }
-
-    function b64utf8(b64) {
-      try { return atob(b64); } catch { return ""; }
-    }
-
-    function readGlobal(state, name) {
-      if (!Array.isArray(state)) return null;
-      for (const kv of state) {
-        if (b64utf8(kv.key) !== name) continue;
-        if (kv.value && kv.value.type === 2) return kv.value.uint;
-        if (kv.value && kv.value.type === 1) return kv.value.bytes;
-        return null;
-      }
-      return null;
-    }
-
-    function paint(status, cls, title) {
-      const headline = document.getElementById("headline");
-      headline.textContent = status;
-      headline.className = "destination " + cls;
-      document.title = title;
-    }
-
-    async function main() {
-      flaps(document.getElementById("last-poke"), "0", 10);
-      flaps(document.getElementById("timeout"), "0", 8);
-      flaps(document.getElementById("tripped"), "0", 1);
-      flaps(document.getElementById("keeper"), "0", 10);
-
-      let cfg;
-      try {
-        const res = await fetch("./deploy.json", { cache: "no-store" });
-        if (!res.ok) throw new Error("deploy.json " + res.status);
-        cfg = await res.json();
-      } catch (e) {
-        document.getElementById("err").hidden = false;
-        document.getElementById("err").textContent = "Could not read deploy.json";
-        return;
-      }
-
-      const appId = Number(cfg.appId) || 0;
-      const subhead = document.getElementById("subhead");
-
-      if (appId <= 0) {
-        paint("NOT DEPLOYED", "grounded", "DEADMAN — NOT DEPLOYED");
-        subhead.textContent = (cfg.notes || "not deployed") + " · keeper " + (cfg.keeperAppId || "—");
-        flaps(document.getElementById("keeper"), String(cfg.keeperAppId || 0), 10);
-        return;
-      }
-
-      subhead.textContent = "app " + appId + " · upkeep " + (cfg.upkeepId || "—") + " · " + (cfg.network || "testnet");
-      try {
-        const res = await fetch(INDEXER + "/v2/applications/" + appId);
-        if (!res.ok) throw new Error("indexer " + res.status);
-        const body = await res.json();
-        const g = (body.params && body.params["global-state"]) || [];
-        const last = readGlobal(g, "last_poke_round");
-        const timeout = readGlobal(g, "timeout_rounds");
-        const tripped = readGlobal(g, "tripped");
-        const keeper = readGlobal(g, "keeper_app");
-        flaps(document.getElementById("last-poke"), last == null ? "—" : String(last), 10);
-        flaps(document.getElementById("timeout"), timeout == null ? "—" : String(timeout), 8);
-        flaps(document.getElementById("tripped"), tripped == null ? "—" : String(tripped), 1);
-        flaps(document.getElementById("keeper"), keeper == null ? String(cfg.keeperAppId || 0) : String(keeper), 10);
-        if (Number(tripped) === 1) {
-          paint("TRIPPED", "late", "DEADMAN — TRIPPED");
-        } else {
-          paint("ALIVE", "live", "DEADMAN — ALIVE");
-        }
-      } catch (e) {
-        paint("NOT DEPLOYED", "grounded", "DEADMAN — NOT DEPLOYED");
-        document.getElementById("err").hidden = false;
-        document.getElementById("err").textContent = "Indexer unreachable; appId is set but state was not read.";
-      }
-    }
-
-    main();
-  </script>
+  <script src="./app.js"></script>
 </body>
 </html>
