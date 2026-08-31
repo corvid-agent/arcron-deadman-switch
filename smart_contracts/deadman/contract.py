@@ -74,8 +74,7 @@ class Deadman(ARC4Contract):
 
         Pass the keeper *application*, not a raw uint64. Payment must be
         >= 100_000 µALGO to this app address so the account exists and
-        holds MBR. `check` authorizes Application(keeper).address — never
-        itob(keeper.id).
+        holds MBR. `check` authorizes Application(keeper).address — never itob of keeper.id.
         """
         assert Txn.sender == Global.creator_address, "Only the creator can set the keeper"
         assert self.keeper_app.value == 0, "Keeper already set"
@@ -113,7 +112,7 @@ class Deadman(ARC4Contract):
         NO inner payment. Fail-soft: if not overdue, return 0 rather than
         reject — a reject would fail execute and back the schedule off.
         """
-        # Inner-call sender is the keeper *app account*, not itob(keeper.id).
+        # Inner-call sender is the keeper *app account*, not itob of keeper.id.
         assert (
             Txn.sender == Application(self.keeper_app.value).address
         ), "Only the keeper app may check"
