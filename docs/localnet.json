@@ -1,0 +1,16 @@
+{
+  "network": "localnet",
+  "genesisId": "dockernet-v1",
+  "algod": "http://localhost:4001",
+  "appId": 1020,
+  "appAddress": "UUYWEZJ2JPVKQGBYHVCGTQ3QVQSBTYVABUIRGHFSIP7IITDYQIY2VNXI4Q",
+  "createTxid": "3T72BWONN3BI3B7T2MRQPFIUR5MKRVY7PZIWXQTMJRDDSDWUMXEQ",
+  "confirmedRound": 15,
+  "creator": "TOZ2LQRCEJH44IDHE2W35XGO2BUJROS2G62VI4BTFEUEUFCOGDHKENJSKI",
+  "contract": "Deadman",
+  "source": "smart_contracts/deadman/contract.py",
+  "extraPages": 0,
+  "approvalBytes": 416,
+  "created_at": "2026-08-31T15:23:50.349696+00:00",
+  "notes": "LocalNet-only recreate proof. Do NOT copy this appId into docs/deploy.json or treat it as TestNet. TestNet stays appId 0 until a real TestNet create. Did not spend TestNet bank. Did not poke upkeep 81 or 87."
+}

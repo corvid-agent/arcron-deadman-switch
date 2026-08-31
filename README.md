@@ -77,6 +77,32 @@ algokit compile python smart_contracts/deadman/contract.py
 Use the TestNet dispenser for fees. Extra escrow above MBR is a payment to the
 app address. `claim` leaves 100_000 µALGO in the account.
 
+
+## LocalNet recreate
+
+Prove the hook compiles and creates on AlgoKit LocalNet. The LocalNet dispenser is free.
+Do **not** copy a LocalNet app id into `docs/deploy.json` or treat Pages as TestNet-live.
+`docs/deploy.json` stays `network: testnet` with `appId: 0` until a real TestNet create.
+LocalNet proof is written to `docs/localnet.json` (separate file; CRT shows it when present).
+
+```bash
+# Docker daemon required
+algokit localnet start
+# wait until localhost:4001 /v2/status answers
+
+pip install puyapy py-algorand-sdk
+python scripts/localnet_recreate.py
+# writes docs/localnet.json with network:"localnet" and the new appId
+```
+
+The script talks only to `localhost:4001` / `4002`, signs with the LocalNet KMD
+`unencrypted-default-wallet` (never prints a mnemonic), refuses TestNet/MainNet
+genesis ids, and never modifies `docs/deploy.json`.
+
+DevMode holds last-round at 0 until the first tx. A successful create is a confirmed
+`application-index` on genesis id `dockernet-v1`, not a TestNet explorer link.
+
+
 ## Tests
 
 CI is compile + static hook tests (`tests/test_hook.py`), not a LocalNet
