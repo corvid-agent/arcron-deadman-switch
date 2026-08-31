@@ -46,6 +46,8 @@ retarget, or fund it.
 
 The CRT board reads `docs/deploy.json`. With `appId` 0 it shows **NOT DEPLOYED**.
 After a real create it should show **ALIVE** or **TRIPPED** from global state.
+When `appId` is 0, the board also footnotes LocalNet recreate/listen proof from
+`docs/localnet.json` / `docs/listen.json` (never painted as TestNet).
 
 ## How a human deploys later
 
@@ -81,10 +83,12 @@ app address. `claim` leaves 100_000 µALGO in the account.
 
 ## LocalNet recreate (not TestNet)
 
-Create, `set_keeper(Application(...))`, and a mock-keeper inner-call of `check()` were proven on AlgoKit LocalNet (`dockernet-v1`). That is **not** TestNet. Do **not** copy any LocalNet app id into `docs/deploy.json` or Pages. `appId` stays 0 until a real TestNet create.
+Create, `set_keeper(Application(...), pay)`, `configure`, `poke`, a mock-keeper inner-call of `check()`, and `claim()` were proven on AlgoKit LocalNet (`dockernet-v1`). That is **not** TestNet. Do **not** copy any LocalNet app id into `docs/deploy.json` or treat it as TestNet. TestNet `appId` stays 0 until a real TestNet create.
 
-LocalNet ids are ephemeral (DevMode / reset). They are not a product and they are not for GitHub Pages.
-LocalNet proof for Pages lives in `docs/localnet.json` (CRT shows it when present). `docs/deploy.json` stays honest TestNet `appId: 0`.
+This pass (2026-08-31 ~4:25 PM MT): reused recreate Deadman **appId 1020** on `dockernet-v1`. `python scripts/localnet_listen.py` created mock keeper **1047**, wired `set_keeper` + `configure(1)` + `poke`, inner-called `check` (1 inner → tripped), then `claim` pulled surplus above MBR. Global after listen: keeper_app=1047, timeout_rounds=1, last_poke_round=42, tripped=1. LocalNet last-round after listen: 46. Did not spend the TestNet bank. Did not poke upkeep 81 or 87.
+
+LocalNet ids are ephemeral (DevMode / reset). They are not a product. They are not TestNet explorer links.
+LocalNet proof for Pages lives in `docs/localnet.json` and `docs/listen.json` (CRT shows them when present). `docs/deploy.json` stays honest TestNet `appId: 0`.
 
 ```bash
 # Docker daemon required
@@ -94,11 +98,13 @@ algokit localnet start
 pip install puyapy py-algorand-sdk
 python scripts/localnet_recreate.py
 # writes docs/localnet.json with network:"localnet" and the new appId
+python scripts/localnet_listen.py
+# set_keeper + configure + poke + mock check + claim; writes docs/listen.json
 ```
 
-The script talks only to `localhost:4001` / `4002`, signs with the LocalNet KMD
-`unencrypted-default-wallet` (never prints a mnemonic), refuses TestNet/MainNet
-genesis ids, and never modifies `docs/deploy.json`.
+Both scripts talk only to `localhost:4001` / `4002`, sign with the LocalNet KMD
+`unencrypted-default-wallet` (never print a mnemonic), refuse TestNet/MainNet
+genesis ids, and never modify `docs/deploy.json`.
 
 DevMode holds last-round at 0 until the first tx. A successful create is a confirmed
 `application-index` on genesis id `dockernet-v1`, not a TestNet explorer link.
@@ -125,7 +131,10 @@ docs/index.html                       CRT board (ALIVE / TRIPPED / NOT DEPLOYED)
 docs/style.css                        phosphor, flaps
 docs/deploy.json                      {"appId":0,...}  flip after TestNet create
 docs/localnet.json                    LocalNet-only proof (network:localnet)
+docs/listen.json                      LocalNet mock-keeper check proof
 scripts/localnet_recreate.py          create on localhost:4001 → localnet.json
+scripts/localnet_listen.py            mock keeper + check() listen → listen.json
+smart_contracts/mock_keeper/          LocalNet-only inner-call of check()
 .github/workflows/ci.yml              pytest + puyapy
 .github/workflows/pages.yml           publishes docs/ from main
 LICENSE                               Apache-2.0
