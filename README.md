@@ -85,7 +85,7 @@ app address. `claim` leaves 100_000 µALGO in the account.
 
 Create, `set_keeper(Application(...), pay)`, `configure`, `poke`, a mock-keeper inner-call of `check()`, and `claim()` were proven on AlgoKit LocalNet (`dockernet-v1`). That is **not** TestNet. Do **not** copy any LocalNet app id into `docs/deploy.json` or treat it as TestNet. TestNet `appId` stays 0 until a real TestNet create.
 
-This pass (2026-09-02 ~9:13 AM MT): recreate Deadman **appId 1139** on `dockernet-v1` (confirmed round 111). `python scripts/localnet_listen.py` created mock keeper **1140**, wired `set_keeper` + `configure(1)` + `poke`, inner-called `check` (1 inner → tripped), then `claim` pulled surplus above MBR. Global after listen: keeper_app=1140, timeout_rounds=1, last_poke_round=116, tripped=1. LocalNet last-round after listen: 120. Did not spend the TestNet bank. Did not poke upkeep 81 or 87.
+This pass (2026-09-03 ~3:06 PM MT): recreate Deadman **appId 1230** on `dockernet-v1` (confirmed round 183). `python scripts/localnet_listen.py` created mock keeper **1231**, wired `set_keeper` + `configure(1)` + `poke`, inner-called `check` (1 inner → tripped), then `claim` pulled surplus above MBR. Global after listen: keeper_app=1231, timeout_rounds=1, last_poke_round=188, tripped=1. LocalNet last-round after listen: 192. Did not spend the TestNet bank. Did not poke upkeep 81 or 87.
 
 LocalNet ids are ephemeral (DevMode / reset). They are not a product. They are not TestNet explorer links.
 LocalNet proof for Pages lives in `docs/localnet.json` and `docs/listen.json` (CRT shows them when present). `docs/deploy.json` stays honest TestNet `appId: 0`.
