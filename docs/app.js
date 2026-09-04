@@ -1,5 +1,10 @@
 const INDEXER = "https://testnet-idx.algonode.cloud";
 const KEEPER = 769891898;
+const PHOS = "#7cff6b";
+const DIM = "#3a8a32";
+const AMBER = "#e6c15a";
+const DEAD = "#143318";
+const RED = "#ff5a4a";
 
 function flaps(el, text, width) {
   const s = String(text).padStart(width, " ").slice(-width);
@@ -159,30 +164,278 @@ async function loadConfig() {
   return res.json();
 }
 
+function sizeCanvas(c) {
+  const dpr = window.devicePixelRatio || 1;
+  const rect = c.getBoundingClientRect();
+  const w = Math.max(280, Math.floor(rect.width || c.width || 640));
+  const h = Math.max(100, Math.floor((c.height / (c.width || 640)) * w));
+  c.width = Math.floor(w * dpr);
+  c.height = Math.floor(h * dpr);
+  const ctx = c.getContext("2d");
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  return { ctx, w, h };
+}
+
+function drawEscrowBars(escrow, lastPoke, tripped) {
+  const c = document.getElementById("escrow-canvas");
+  if (!c) return;
+  const { ctx, w, h } = sizeCanvas(c);
+  ctx.clearRect(0, 0, w, h);
+  const vals = [
+    { label: "escrow", v: Number(escrow || 0), color: PHOS },
+    { label: "last_poke", v: Number(lastPoke || 0), color: AMBER },
+    { label: "tripped", v: Number(tripped || 0), color: Number(tripped) ? RED : DIM },
+  ];
+  const max = Math.max(...vals.map((x) => x.v), 1);
+  const barH = Math.min(28, (h - 36) / vals.length - 8);
+  vals.forEach((row, i) => {
+    const y = 18 + i * (barH + 14);
+    const bw = Math.max(2, (row.v / max) * (w - 110));
+    ctx.fillStyle = DEAD;
+    ctx.fillRect(90, y, w - 110, barH);
+    ctx.fillStyle = row.color;
+    ctx.shadowColor = row.color;
+    ctx.shadowBlur = 8;
+    ctx.fillRect(90, y, bw, barH);
+    ctx.shadowBlur = 0;
+    ctx.fillStyle = DIM;
+    ctx.font = "11px IBM Plex Mono, monospace";
+    ctx.fillText(row.label, 4, y + barH - 6);
+    ctx.fillStyle = PHOS;
+    ctx.fillText(String(row.v), 94, y + barH - 6);
+  });
+}
+
+function drawHistoryLine(rows) {
+  const c = document.getElementById("history-canvas");
+  const meta = document.getElementById("history-meta");
+  if (!c) return;
+  const { ctx, w, h } = sizeCanvas(c);
+  ctx.clearRect(0, 0, w, h);
+  if (meta) meta.textContent = "sqlite " + rows.length + " samples · LocalNet only";
+  if (!rows.length) {
+    ctx.fillStyle = DIM;
+    ctx.font = "12px IBM Plex Mono, monospace";
+    ctx.fillText("no history yet", 12, 28);
+    return;
+  }
+  const pokes = rows.map((r) => Number(r.last_poke_round || 0));
+  const escrows = rows.map((r) => Number(r.escrow || 0));
+  const tripped = rows.map((r) => Number(r.tripped || 0));
+  const max = Math.max(...pokes, ...escrows, 1);
+  const pad = 16;
+  function series(vals, color, fill) {
+    ctx.beginPath();
+    vals.forEach((v, i) => {
+      const px = pad + (i * (w - pad * 2)) / Math.max(1, vals.length - 1);
+      const py = h - pad - (v / max) * (h - pad * 2);
+      if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+    });
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 2;
+    ctx.shadowColor = color;
+    ctx.shadowBlur = 6;
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+    if (fill) {
+      const lastX = pad + ((vals.length - 1) * (w - pad * 2)) / Math.max(1, vals.length - 1);
+      ctx.lineTo(lastX, h - pad);
+      ctx.lineTo(pad, h - pad);
+      ctx.closePath();
+      ctx.fillStyle = fill;
+      ctx.fill();
+    }
+  }
+  series(escrows, PHOS, "rgba(124,255,107,0.08)");
+  series(pokes, AMBER, null);
+  // tripped markers (scaled to max so a 1 shows at the top band)
+  tripped.forEach((t, i) => {
+    if (!t) return;
+    const px = pad + (i * (w - pad * 2)) / Math.max(1, tripped.length - 1);
+    const py = pad + 8;
+    ctx.beginPath();
+    ctx.arc(px, py, 4, 0, Math.PI * 2);
+    ctx.fillStyle = RED;
+    ctx.shadowColor = RED;
+    ctx.shadowBlur = 8;
+    ctx.fill();
+    ctx.shadowBlur = 0;
+  });
+  ctx.fillStyle = DIM;
+  ctx.font = "10px IBM Plex Mono, monospace";
+  rows.forEach((r, i) => {
+    const px = pad + (i * (w - pad * 2)) / Math.max(1, rows.length - 1);
+    ctx.fillText(String(r.appId || ""), px - 10, h - 2);
+  });
+}
+
+function drawTimeline(calls) {
+  const c = document.getElementById("timeline-canvas");
+  if (!c) return;
+  const { ctx, w, h } = sizeCanvas(c);
+  ctx.clearRect(0, 0, w, h);
+  const steps = Array.isArray(calls) && calls.length
+    ? calls.map((x) => ({ method: x.method || "?", round: x.round, ok: !!x.success }))
+    : [
+        { method: "set_keeper", ok: false },
+        { method: "configure", ok: false },
+        { method: "poke", ok: false },
+        { method: "check", ok: false },
+        { method: "claim", ok: false },
+      ];
+  const n = steps.length;
+  const y = h / 2;
+  ctx.strokeStyle = DEAD;
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(24, y);
+  ctx.lineTo(w - 24, y);
+  ctx.stroke();
+  steps.forEach((s, i) => {
+    const px = 24 + (i * (w - 48)) / Math.max(1, n - 1);
+    ctx.beginPath();
+    ctx.arc(px, y, s.ok ? 7 : 5, 0, Math.PI * 2);
+    ctx.fillStyle = s.ok ? PHOS : DEAD;
+    ctx.shadowColor = s.ok ? PHOS : "transparent";
+    ctx.shadowBlur = s.ok ? 10 : 0;
+    ctx.fill();
+    ctx.shadowBlur = 0;
+    ctx.fillStyle = s.ok ? PHOS : DIM;
+    ctx.font = "10px IBM Plex Mono, monospace";
+    ctx.textAlign = "center";
+    ctx.fillText(s.method, px, y - 14);
+    if (s.round != null) ctx.fillText("r" + s.round, px, y + 22);
+  });
+  ctx.textAlign = "left";
+}
+
+let sqlDb = null;
+
+async function bootSql(rows) {
+  if (typeof initSqlJs !== "function") return rows;
+  const SQL = await initSqlJs({
+    locateFile: (f) => "https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.11.0/" + f,
+  });
+  sqlDb = new SQL.Database();
+  sqlDb.run(
+    "CREATE TABLE samples (t TEXT, network TEXT, appId INTEGER, mockKeeperAppId INTEGER, lastRound INTEGER, escrow INTEGER, last_poke_round INTEGER, tripped INTEGER, timeout_rounds INTEGER, calls INTEGER, source TEXT);"
+  );
+  const ins = sqlDb.prepare(
+    "INSERT INTO samples VALUES (?,?,?,?,?,?,?,?,?,?,?)"
+  );
+  rows.forEach((r) => {
+    ins.run([
+      r.t || "",
+      r.network || "localnet",
+      Number(r.appId || 0),
+      Number(r.mockKeeperAppId || 0),
+      Number(r.lastRound || 0),
+      Number(r.escrow || 0),
+      Number(r.last_poke_round || 0),
+      Number(r.tripped || 0),
+      Number(r.timeout_rounds || 0),
+      Number(r.calls || 0),
+      r.source || "",
+    ]);
+  });
+  ins.free();
+  const res = sqlDb.exec(
+    "SELECT t, network, appId, mockKeeperAppId, lastRound, escrow, last_poke_round, tripped, timeout_rounds, calls, source FROM samples WHERE network='localnet' ORDER BY lastRound, appId"
+  );
+  if (!res[0]) return rows;
+  return res[0].values.map((v) => ({
+    t: v[0],
+    network: v[1],
+    appId: v[2],
+    mockKeeperAppId: v[3],
+    lastRound: v[4],
+    escrow: v[5],
+    last_poke_round: v[6],
+    tripped: v[7],
+    timeout_rounds: v[8],
+    calls: v[9],
+    source: v[10],
+  }));
+}
+
+async function loadHistoryGraphs(listen) {
+  let history = [];
+  try {
+    const res = await fetch("./history.json", { cache: "no-store" });
+    if (res.ok) history = await res.json();
+  } catch (_) {
+    history = [];
+  }
+  if (!Array.isArray(history)) history = [];
+  // Only LocalNet rows — never paint TestNet-looking ids from history.
+  history = history.filter((r) => r && r.network === "localnet" && Number(r.appId) > 0);
+  let rows = history;
+  try {
+    rows = await bootSql(history);
+  } catch (_) {
+    rows = history;
+  }
+  const g = (listen && listen.global) || {};
+  const last = rows[rows.length - 1] || null;
+  let escrow = 0;
+  if (listen && Array.isArray(listen.calls)) {
+    const sk = listen.calls.find((c) => c && c.method === "set_keeper" && c.paymentMicroAlgos != null);
+    if (sk) escrow = Number(sk.paymentMicroAlgos);
+  }
+  if (!escrow && last) escrow = Number(last.escrow || 0);
+  const lastPoke = Number(
+    g.last_poke_round != null ? g.last_poke_round : (last && last.last_poke_round) || 0
+  );
+  const tripped = Number(g.tripped != null ? g.tripped : (last && last.tripped) || 0);
+  drawEscrowBars(escrow, lastPoke, tripped);
+  drawHistoryLine(rows);
+  drawTimeline(listen && Array.isArray(listen.calls) ? listen.calls : []);
+}
 
 async function loadLocalnetProof() {
   const el = document.getElementById("localnet-proof");
-  if (!el) return;
+  if (!el) {
+    await loadHistoryGraphs(null);
+    return null;
+  }
+  let listen = null;
   try {
     const res = await fetch("./localnet.json", { cache: "no-store" });
-    if (!res.ok) return;
+    if (!res.ok) {
+      await loadHistoryGraphs(null);
+      return null;
+    }
     const ln = await res.json();
-    if (!ln || ln.network !== "localnet" || !(Number(ln.appId) > 0)) return;
+    if (!ln || ln.network !== "localnet" || !(Number(ln.appId) > 0)) {
+      await loadHistoryGraphs(null);
+      return null;
+    }
     el.hidden = false;
     let line =
       "LocalNet proof · app " + ln.appId +
+      " · round " + (ln.confirmedRound != null ? ln.confirmedRound : "—") +
       " · " + (ln.genesisId || "dockernet") +
       " · not TestNet (see docs/localnet.json)";
     try {
       const lr = await fetch("./listen.json", { cache: "no-store" });
       if (lr.ok) {
-        const listen = await lr.json();
+        listen = await lr.json();
         if (listen && listen.network === "localnet" && Number(listen.appId) === Number(ln.appId)) {
           const g = listen.global || {};
+          const when = listen.listened_at
+            ? " · heard " + String(listen.listened_at).replace(/\.\d+/, "").replace("Z", "Z")
+            : "";
+          flaps(document.getElementById("last-poke"), String(g.last_poke_round || 0), 10);
+          flaps(document.getElementById("timeout"), String(g.timeout_rounds || 0), 8);
+          flaps(document.getElementById("tripped"), String(g.tripped || 0), 1);
+          if (listen.mockKeeperAppId) {
+            flaps(document.getElementById("keeper"), String(listen.mockKeeperAppId), 10);
+          }
           line +=
             " · mock keeper " + (listen.mockKeeperAppId || "—") +
             " · tripped " + (g.tripped ?? "—") +
             " · last_poke " + (g.last_poke_round ?? "—") +
+            when +
             " (see docs/listen.json)";
         }
       }
@@ -190,8 +443,11 @@ async function loadLocalnetProof() {
       /* optional listen.json */
     }
     el.textContent = line;
+    await loadHistoryGraphs(listen);
+    return listen;
   } catch (_) {
-    /* optional file */
+    await loadHistoryGraphs(null);
+    return null;
   }
 }
 
@@ -200,6 +456,9 @@ async function main() {
   flaps(document.getElementById("timeout"), "0", 8);
   flaps(document.getElementById("tripped"), "0", 1);
   flaps(document.getElementById("keeper"), String(KEEPER), 10);
+  drawEscrowBars(0, 0, 0);
+  drawHistoryLine([]);
+  drawTimeline([]);
 
   let cfg;
   try {
@@ -207,6 +466,7 @@ async function main() {
   } catch (e) {
     document.getElementById("err").hidden = false;
     document.getElementById("err").textContent = "Could not read deploy.json";
+    await loadHistoryGraphs(null);
     return;
   }
 
@@ -236,6 +496,9 @@ async function main() {
     flaps(document.getElementById("timeout"), timeout == null ? "—" : String(timeout), 8);
     flaps(document.getElementById("tripped"), tripped == null ? "—" : String(tripped), 1);
     flaps(document.getElementById("keeper"), keeperOnChain == null ? String(keeper) : String(keeperOnChain), 10);
+    drawEscrowBars(0, last || 0, tripped || 0);
+    drawTimeline([]);
+    await loadHistoryGraphs(null);
     if (Number(tripped) === 1) {
       paint("TRIPPED", "late", "DEADMAN — TRIPPED");
     } else {
@@ -245,7 +508,11 @@ async function main() {
     paint("NOT DEPLOYED", "grounded", "DEADMAN — NOT DEPLOYED");
     document.getElementById("err").hidden = false;
     document.getElementById("err").textContent = "Indexer unreachable; appId is set but state was not read.";
+    await loadHistoryGraphs(null);
   }
 }
 
 main();
+window.addEventListener("resize", () => {
+  /* redrawn on next load; keep light */
+});

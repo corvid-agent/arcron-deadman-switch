@@ -41,16 +41,39 @@
       </div>
     </section>
 
+    <section class="graphs" id="graphs" aria-label="deadman escrow graphs">
+      <div class="graph-cell">
+        <div class="label">Escrow · poke · tripped</div>
+        <canvas id="escrow-canvas" width="640" height="160" aria-label="escrow last_poke tripped bars"></canvas>
+        <div class="graph-legend">
+          <span class="lg locked">escrow</span>
+          <span class="lg credited">last_poke</span>
+          <span class="lg claimed">tripped</span>
+        </div>
+      </div>
+      <div class="graph-cell">
+        <div class="label">LocalNet history · escrow / poke</div>
+        <canvas id="history-canvas" width="640" height="160" aria-label="escrow and last_poke over LocalNet proofs"></canvas>
+        <div class="meta" id="history-meta">sqlite 0 samples</div>
+      </div>
+      <div class="graph-cell wide">
+        <div class="label">Call timeline</div>
+        <canvas id="timeline-canvas" width="640" height="120" aria-label="set_keeper configure poke check claim"></canvas>
+      </div>
+    </section>
+
     <p class="meta" id="localnet-proof" hidden></p>
     <p class="notes" id="notes">
       TestNet: flip <code>docs/deploy.json</code> <code>appId</code> after TestNet create.
       <code>check()</code> trips a flag; it never inner-pays.
       <code>claim()</code> sends only the surplus above 100_000 µALGO MBR.
-      First-party demo. Not deployed. Unaudited. TestNet only. Keeper
+      Graphs paint LocalNet listen history when TestNet <code>appId</code> is 0 —
+      never treat those ids as TestNet. First-party demo. Unaudited. Keeper
       <a href="https://testnet.explorer.perawallet.app/application/769891898">769891898</a>.
     </p>
     <p class="err" id="err" hidden></p>
   </main>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.11.0/sql-wasm.js"></script>
   <script src="./app.js"></script>
 </body>
 </html>

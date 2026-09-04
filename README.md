@@ -88,7 +88,7 @@ Create, `set_keeper(Application(...), pay)`, `configure`, `poke`, a mock-keeper 
 This pass (2026-09-03 ~3:06 PM MT): recreate Deadman **appId 1230** on `dockernet-v1` (confirmed round 183). `python scripts/localnet_listen.py` created mock keeper **1231**, wired `set_keeper` + `configure(1)` + `poke`, inner-called `check` (1 inner → tripped), then `claim` pulled surplus above MBR. Global after listen: keeper_app=1231, timeout_rounds=1, last_poke_round=188, tripped=1. LocalNet last-round after listen: 192. Did not spend the TestNet bank. Did not poke upkeep 81 or 87.
 
 LocalNet ids are ephemeral (DevMode / reset). They are not a product. They are not TestNet explorer links.
-LocalNet proof for Pages lives in `docs/localnet.json` and `docs/listen.json` (CRT shows them when present). `docs/deploy.json` stays honest TestNet `appId: 0`.
+LocalNet proof for Pages lives in `docs/localnet.json` and `docs/listen.json` (CRT shows them when present). `docs/history.json` appends LocalNet listen samples for the phosphor escrow / last_poke / tripped graphs (in-page sql.js). `node scripts/append_history.mjs` appends from `listen.json` without touching `deploy.json`. `docs/deploy.json` stays honest TestNet `appId: 0`.
 
 ```bash
 # Docker daemon required
