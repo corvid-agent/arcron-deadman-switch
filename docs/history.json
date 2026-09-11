@@ -208,5 +208,19 @@
     "timeout_rounds": 1,
     "calls": 5,
     "source": "docs/listen.json"
+  },
+  {
+    "t": "2026-09-11T19:58:23.826164+00:00",
+    "network": "localnet",
+    "genesisId": "dockernet-v1",
+    "appId": 1079,
+    "mockKeeperAppId": 1080,
+    "lastRound": 72,
+    "escrow": 200000,
+    "last_poke_round": 68,
+    "tripped": 1,
+    "timeout_rounds": 1,
+    "calls": 5,
+    "source": "docs/listen.json"
   }
 ]
