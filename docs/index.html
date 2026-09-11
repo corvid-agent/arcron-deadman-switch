@@ -13,7 +13,7 @@
   <main class="crt" id="crt">
     <header>
       <h1>Deadman</h1>
-      <div class="meta">TestNet · unaudited · MBR-safe</div>
+      <div class="meta" id="network-meta">LocalNet proof only · not on TestNet · unaudited · MBR-safe</div>
     </header>
 
     <section class="status-row">
@@ -64,11 +64,12 @@
 
     <p class="meta" id="localnet-proof" hidden></p>
     <p class="notes" id="notes">
-      TestNet: flip <code>docs/deploy.json</code> <code>appId</code> after TestNet create.
-      <code>check()</code> trips a flag; it never inner-pays.
-      <code>claim()</code> sends only the surplus above 100_000 µALGO MBR.
+      Read-only status board. No wallet. Live board is LocalNet-only until
+      <code>docs/deploy.json</code> <code>appId</code> is a real TestNet create
+      (currently 0 — not deployed). <code>check()</code> trips a flag; it never
+      inner-pays. <code>claim()</code> sends only the surplus above 100_000 µALGO MBR.
       Graphs paint LocalNet listen history when TestNet <code>appId</code> is 0 —
-      never treat those ids as TestNet. First-party demo. Unaudited. Keeper
+      never treat LocalNet ids as TestNet. First-party demo. Unaudited. Keeper
       <a href="https://testnet.explorer.perawallet.app/application/769891898">769891898</a>.
     </p>
     <p class="err" id="err" hidden></p>
