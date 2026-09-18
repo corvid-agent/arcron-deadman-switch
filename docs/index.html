@@ -10,16 +10,30 @@
   <link rel="stylesheet" href="./style.css" />
 </head>
 <body>
+  <div class="tape" aria-hidden="true">
+    <span>LOCALNET PROOF</span><span>NOT ON TESTNET</span><span>NO WALLET</span><span>MBR-SAFE</span><span>SKIP 81/87</span>
+    <span>LOCALNET PROOF</span><span>NOT ON TESTNET</span><span>NO WALLET</span><span>MBR-SAFE</span><span>SKIP 81/87</span>
+  </div>
   <main class="crt" id="crt">
     <header>
       <h1>Deadman</h1>
-      <div class="meta" id="network-meta">LocalNet proof only · not on TestNet · unaudited · MBR-safe</div>
+      <div class="header-right">
+        <span class="net-badge localnet" id="network-badge" title="Painted from deploy.json appId">LOCALNET</span>
+        <div class="meta" id="network-meta">LocalNet proof only · not on TestNet · unaudited · MBR-safe</div>
+      </div>
     </header>
 
     <section class="status-row">
       <div class="label">Board</div>
       <div class="destination grounded" id="headline">NOT DEPLOYED</div>
       <div class="meta" id="subhead">not deployed · keeper 769891898</div>
+    </section>
+
+    <section class="method-legend" aria-label="Hook roles">
+      <div class="pill poke"><span class="lamp"></span> POKE <strong>check-in</strong></div>
+      <div class="pill check"><span class="lamp"></span> CHECK <strong>trip flag</strong></div>
+      <div class="pill claim"><span class="lamp"></span> CLAIM <strong>pull surplus</strong></div>
+      <div class="pill mbr"><span class="lamp"></span> MBR <strong>keep 100k</strong></div>
     </section>
 
     <section class="board">
@@ -73,6 +87,13 @@
       <a href="https://testnet.explorer.perawallet.app/application/769891898">769891898</a>.
     </p>
     <p class="err" id="err" hidden></p>
+    <footer class="apron">
+      <span>TestNet <code>deploy.json</code> appId stays 0 until a real create</span>
+      <span>·</span>
+      <span>LocalNet ids are ephemeral — never explorer links</span>
+      <span>·</span>
+      <span>Skip upkeep 81 / 87</span>
+    </footer>
   </main>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.11.0/sql-wasm.js"></script>
   <script src="./app.js"></script>

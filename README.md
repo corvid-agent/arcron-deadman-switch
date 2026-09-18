@@ -83,9 +83,11 @@ app address. `claim` leaves 100_000 µALGO in the account.
 
 ## LocalNet recreate (not TestNet)
 
+**Quick run (Docker + AlgoKit LocalNet only):** start LocalNet, recreate, listen, then open Pages — never copy the LocalNet `appId` into `docs/deploy.json`.
+
 Create, `set_keeper(Application(...), pay)`, `configure`, `poke`, a mock-keeper inner-call of `check()`, and `claim()` were proven on AlgoKit LocalNet (`dockernet-v1`). That is **not** TestNet. Do **not** copy any LocalNet app id into `docs/deploy.json` or treat it as TestNet. TestNet `appId` stays 0 until a real TestNet create.
 
-This pass (2026-09-11 ~1:58 PM MT): recreate Deadman **appId 1079** on `dockernet-v1` (confirmed round 63). `python scripts/localnet_listen.py` created mock keeper **1080**, wired `set_keeper` + `configure(1)` + `poke`, inner-called `check` (1 inner → tripped), then `claim` pulled surplus above MBR. Global after listen: keeper_app=1080, timeout_rounds=1, last_poke_round=68, tripped=1. LocalNet last-round after listen: 72. Did not spend the TestNet bank. Did not poke upkeep 81 or 87.
+This pass (2026-09-17 ~10:07 AM MT): recreate Deadman **appId 1118** on `dockernet-v1` (confirmed round 94, `createTxid` in `docs/localnet.json`). `python scripts/localnet_listen.py` created mock keeper **1119**, wired `set_keeper` + `configure(1)` + `poke`, inner-called `check` (1 inner → tripped), then `claim` pulled surplus above MBR. Global after listen: keeper_app=1119, timeout_rounds=1, last_poke_round=99, tripped=1. LocalNet last-round after listen: 103. Did not spend the TestNet bank. Did not poke upkeep 81 or 87.
 
 LocalNet ids are ephemeral (DevMode / reset). They are not a product. They are not TestNet explorer links.
 LocalNet proof for Pages lives in `docs/localnet.json` and `docs/listen.json` (CRT shows them when present). `docs/history.json` appends LocalNet listen samples for the phosphor escrow / last_poke / tripped graphs (in-page sql.js). `node scripts/append_history.mjs` appends from `listen.json` without touching `deploy.json`. `docs/deploy.json` stays honest TestNet `appId: 0`.

@@ -27,6 +27,22 @@ function paint(status, cls, title) {
 function setNetworkMeta(text) {
   const el = document.getElementById("network-meta");
   if (el) el.textContent = text;
+  const badge = document.getElementById("network-badge");
+  if (!badge) return;
+  const t = String(text || "").toLowerCase();
+  if (t.includes("unknown") || t.includes("do not assume")) {
+    badge.textContent = "UNKNOWN";
+    badge.className = "net-badge unknown";
+  } else if (t.includes("localnet") || t.includes("not on testnet")) {
+    badge.textContent = "LOCALNET";
+    badge.className = "net-badge localnet";
+  } else if (t.includes("testnet")) {
+    badge.textContent = "TESTNET";
+    badge.className = "net-badge testnet";
+  } else {
+    badge.textContent = "UNKNOWN";
+    badge.className = "net-badge unknown";
+  }
 }
 
 function b64utf8(b64) {
