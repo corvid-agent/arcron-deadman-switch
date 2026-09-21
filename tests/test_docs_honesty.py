@@ -130,3 +130,37 @@ def test_append_history_never_writes_deploy() -> None:
     assert "writeFileSync(deployPath" not in append
     assert "history.json" in append
 
+
+def test_due_json_unsigned_keeper_probe() -> None:
+    """Unsigned TestNet keeper probe; never invents a deadman app/upkeep."""
+    due_path = ROOT / "docs" / "due.json"
+    assert due_path.is_file()
+    due = json.loads(due_path.read_text())
+    assert due.get("network") == "testnet"
+    assert int(due.get("keeperAppId") or 0) == 769891898
+    assert int(due.get("deadmanAppId") or 0) == 0
+    assert int(due.get("deadmanUpkeepId") or 0) == 0
+    assert int(due.get("lastRound") or 0) > 0
+    assert int(due.get("nextUpkeepId") or 0) > 0
+    assert due.get("probedAt")
+    assert "unsigned" in str(due.get("source") or "").lower() or "algod" in str(due.get("source") or "").lower()
+    # LocalNet proof ids must not leak into due.json as a TestNet deadman
+    assert int(due.get("deadmanAppId") or 0) != int(LOCALNET.get("appId") or 0)
+    skipped = {int(s.get("id")) for s in (due.get("skipped") or []) if isinstance(s, dict)}
+    assert 81 in skipped
+    assert 87 in skipped
+    # deploy.json stays honest
+    assert int(DEPLOY.get("appId") or 0) == 0
+    assert str(LOCALNET.get("appId")) not in json.dumps(due)
+
+
+def test_pages_loads_due_json_without_flipping_to_testnet() -> None:
+    assert "loadDueSnapshot" in APP_JS
+    assert "./due.json" in APP_JS
+    assert "deadmanAppId" in APP_JS
+    # Undeployed path must keep "not on TestNet" so badge stays LOCALNET
+    assert "not on TestNet" in APP_JS
+    html = (ROOT / "docs" / "index.html").read_text()
+    assert "LOCALNET APP 1118" in html
+    assert "due.json" in html
+    assert str(LOCALNET.get("appId")) in html

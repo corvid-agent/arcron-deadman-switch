@@ -11,8 +11,8 @@
 </head>
 <body>
   <div class="tape" aria-hidden="true">
-    <span>LOCALNET PROOF</span><span>NOT ON TESTNET</span><span>NO WALLET</span><span>MBR-SAFE</span><span>SKIP 81/87</span>
-    <span>LOCALNET PROOF</span><span>NOT ON TESTNET</span><span>NO WALLET</span><span>MBR-SAFE</span><span>SKIP 81/87</span>
+    <span>LOCALNET APP 1118</span><span>NOT ON TESTNET</span><span>DEPLOY 0</span><span>KEEPER 769891898</span><span>SKIP 81/87</span><span>MBR-SAFE</span>
+    <span>LOCALNET APP 1118</span><span>NOT ON TESTNET</span><span>DEPLOY 0</span><span>KEEPER 769891898</span><span>SKIP 81/87</span><span>MBR-SAFE</span>
   </div>
   <main class="crt" id="crt">
     <header>
@@ -83,14 +83,18 @@
       (currently 0 — not deployed). <code>check()</code> trips a flag; it never
       inner-pays. <code>claim()</code> sends only the surplus above 100_000 µALGO MBR.
       Graphs paint LocalNet listen history when TestNet <code>appId</code> is 0 —
-      never treat LocalNet ids as TestNet. First-party demo. Unaudited. Keeper
+      never treat LocalNet ids as TestNet. <code>docs/due.json</code> is an
+      unsigned TestNet keeper probe (balance / frozen / next_upkeep_id / lastRound)
+      and does not invent a deadman app id. First-party demo. Unaudited. Keeper
       <a href="https://testnet.explorer.perawallet.app/application/769891898">769891898</a>.
     </p>
     <p class="err" id="err" hidden></p>
     <footer class="apron">
       <span>TestNet <code>deploy.json</code> appId stays 0 until a real create</span>
       <span>·</span>
-      <span>LocalNet ids are ephemeral — never explorer links</span>
+      <span>LocalNet proof app 1118 / mock 1119 — never explorer links</span>
+      <span>·</span>
+      <span><code>due.json</code> = unsigned keeper probe</span>
       <span>·</span>
       <span>Skip upkeep 81 / 87</span>
     </footer>

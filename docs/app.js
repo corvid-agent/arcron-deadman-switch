@@ -413,6 +413,23 @@ async function loadHistoryGraphs(listen) {
   drawTimeline(listen && Array.isArray(listen.calls) ? listen.calls : []);
 }
 
+
+async function loadDueSnapshot() {
+  try {
+    const res = await fetch("./due.json", { cache: "no-store" });
+    if (!res.ok) return null;
+    const due = await res.json();
+    if (!due || due.network !== "testnet") return null;
+    // Honesty: due.json may describe the TestNet *keeper*, but never paints
+    // deadman as deployed. deadmanAppId must stay 0 here.
+    if (Number(due.deadmanAppId || 0) !== 0) return null;
+    if (Number(due.deadmanUpkeepId || 0) !== 0) return null;
+    return due;
+  } catch (_) {
+    return null;
+  }
+}
+
 async function loadLocalnetProof() {
   const el = document.getElementById("localnet-proof");
   if (!el) {
@@ -499,8 +516,21 @@ async function main() {
 
   if (appId <= 0) {
     paint("NOT DEPLOYED", "grounded", "DEADMAN — NOT DEPLOYED");
+    // Keep "not on TestNet" so the badge stays LOCALNET even when due.json
+    // reports a live TestNet keeper round — deadman itself is undeployed.
     setNetworkMeta("LocalNet proof only · not on TestNet · unaudited · MBR-safe");
-    subhead.textContent = "not deployed · keeper " + keeper + " · LocalNet only";
+    let sub = "not deployed · keeper " + keeper + " · LocalNet app 1118";
+    const due = await loadDueSnapshot();
+    if (due) {
+      const lr = due.lastRound != null ? due.lastRound : "—";
+      const next = due.nextUpkeepId != null ? due.nextUpkeepId : "—";
+      const fr = Number(due.frozen) === 1 ? "frozen" : "thawed";
+      sub =
+        "not deployed · keeper " + keeper +
+        " · TestNet r" + lr + " · next_upkeep " + next + " · " + fr +
+        " · LocalNet app 1118";
+    }
+    subhead.textContent = sub;
     await loadLocalnetProof();
     return;
   }

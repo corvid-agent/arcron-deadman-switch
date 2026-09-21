@@ -49,6 +49,19 @@ After a real create it should show **ALIVE** or **TRIPPED** from global state.
 When `appId` is 0, the board also footnotes LocalNet recreate/listen proof from
 `docs/localnet.json` / `docs/listen.json` (never painted as TestNet).
 
+### Unsigned keeper probe (`docs/due.json`)
+
+When dockerd/LocalNet is down and TestNet deadman is still `appId` 0, CoS refreshes
+an **unsigned** TestNet read of Arcron keeper `769891898` into `docs/due.json`
+(algod + indexer: lastRound, frozen, next_upkeep_id, keeper balance). This does
+**not** create a deadman app, does **not** register an upkeep, and never copies
+LocalNet ids 1118/1119 into `deploy.json`. Skip upkeep 81 and 87.
+
+This pass (2026-09-21 ~2:00 PM MT): dockerd down → no LocalNet recreate. Wrote
+`docs/due.json` from live TestNet reads (keeper thawed, `deadmanAppId`/`deadmanUpkeepId`
+stay 0). CRT tape/apron synced to LocalNet proof **app 1118** / mock **1119** and
+the undeployed badge stays **LOCALNET** (not TestNet).
+
 ## How a human deploys later
 
 No mnemonic belongs in this repo, in a workflow, or in `docs/deploy.json`.
@@ -134,6 +147,7 @@ docs/style.css                        phosphor, flaps
 docs/deploy.json                      {"appId":0,...}  flip after TestNet create
 docs/localnet.json                    LocalNet-only proof (network:localnet)
 docs/listen.json                      LocalNet mock-keeper check proof
+docs/due.json                         unsigned TestNet keeper probe (deadman stays 0)
 scripts/localnet_recreate.py          create on localhost:4001 → localnet.json
 scripts/localnet_listen.py            mock keeper + check() listen → listen.json
 smart_contracts/mock_keeper/          LocalNet-only inner-call of check()
