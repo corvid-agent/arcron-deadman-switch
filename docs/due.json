@@ -5,13 +5,13 @@
   "indexer": "https://testnet-idx.algonode.cloud",
   "keeperAppId": 769891898,
   "keeperAddress": "M4YFP33L5VIFRF53X53WUMQWBOWSLYQNBSSAJV2SORGF43L36XBY7OREUA",
-  "keeperBalanceMicroAlgos": 20650882,
+  "keeperBalanceMicroAlgos": 18946567,
   "keeperMinBalance": 2745200,
   "frozen": 0,
   "nextUpkeepId": 121,
   "createdAtRound": 66668923,
   "creator": "E5M2OH5XNDMNABJ6VOFOUVR2IKRPCGQH43PVC5P3DWQQ2LV2VJV2FJZQ3E",
-  "lastRound": 67531170,
+  "lastRound": 67563229,
   "deadmanAppId": 0,
   "deadmanUpkeepId": 0,
   "skipped": [
@@ -24,7 +24,7 @@
       "reason": "do not poke"
     }
   ],
-  "probedAt": "2026-09-21T19:59:42.840Z",
+  "probedAt": "2026-09-22T20:02:07.027Z",
   "source": "unsigned TestNet algod+indexer read",
   "notes": "Deadman still undeployed (docs/deploy.json appId 0). Keeper 769891898 is live on TestNet. LocalNet recreate/listen proof stays in localnet.json + listen.json only \u2014 never copy those ids into deploy.json. Did not spend TestNet bank. Did not poke upkeep 81 or 87. dockerd/LocalNet was down this pass so no recreate."
 }

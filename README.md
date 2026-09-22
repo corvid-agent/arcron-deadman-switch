@@ -57,10 +57,11 @@ an **unsigned** TestNet read of Arcron keeper `769891898` into `docs/due.json`
 **not** create a deadman app, does **not** register an upkeep, and never copies
 LocalNet ids 1118/1119 into `deploy.json`. Skip upkeep 81 and 87.
 
-This pass (2026-09-21 ~2:00 PM MT): dockerd down → no LocalNet recreate. Wrote
-`docs/due.json` from live TestNet reads (keeper thawed, `deadmanAppId`/`deadmanUpkeepId`
-stay 0). CRT tape/apron synced to LocalNet proof **app 1118** / mock **1119** and
-the undeployed badge stays **LOCALNET** (not TestNet).
+This pass (2026-09-22 ~2:01 PM MT): dockerd/LocalNet still down → no recreate.
+Refreshed `docs/due.json` from live unsigned TestNet algod+indexer reads of keeper
+`769891898` (thawed, `nextUpkeepId` 121, `deadmanAppId`/`deadmanUpkeepId` stay 0).
+CRT still footnotes LocalNet proof **app 1118** / mock **1119**; badge stays
+**LOCALNET** (not TestNet). Did not touch upkeep 81 or 87.
 
 ## How a human deploys later
 
