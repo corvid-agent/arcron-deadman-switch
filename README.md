@@ -57,11 +57,16 @@ an **unsigned** TestNet read of Arcron keeper `769891898` into `docs/due.json`
 **not** create a deadman app, does **not** register an upkeep, and never copies
 LocalNet ids 1118/1119 into `deploy.json`. Skip upkeep 81 and 87.
 
-This pass (2026-09-22 ~2:01 PM MT): dockerd/LocalNet still down → no recreate.
-Refreshed `docs/due.json` from live unsigned TestNet algod+indexer reads of keeper
-`769891898` (thawed, `nextUpkeepId` 121, `deadmanAppId`/`deadmanUpkeepId` stay 0).
+Reproducible: `python scripts/probe_keeper.py` (read-only; never writes
+`docs/deploy.json`; never prints a mnemonic; refuses if keeper address equals
+the TestNet bank).
+
+This pass (2026-09-23 ~4:09 PM MT): dockerd/LocalNet still down → no recreate.
+Ran `python scripts/probe_keeper.py` → refreshed `docs/due.json` from live
+unsigned TestNet algod+indexer reads of keeper `769891898` (thawed/frozen=0,
+`nextUpkeepId` 121, lastRound in due.json, `deadmanAppId`/`deadmanUpkeepId` stay 0).
 CRT still footnotes LocalNet proof **app 1118** / mock **1119**; badge stays
-**LOCALNET** (not TestNet). Did not touch upkeep 81 or 87.
+**LOCALNET** (not TestNet). Did not spend TestNet bank. Did not touch upkeep 81 or 87.
 
 ## How a human deploys later
 
@@ -148,6 +153,7 @@ docs/style.css                        phosphor, flaps
 docs/deploy.json                      {"appId":0,...}  flip after TestNet create
 docs/localnet.json                    LocalNet-only proof (network:localnet)
 docs/listen.json                      LocalNet mock-keeper check proof
+scripts/probe_keeper.py                unsigned TestNet keeper → docs/due.json
 docs/due.json                         unsigned TestNet keeper probe (deadman stays 0)
 scripts/localnet_recreate.py          create on localhost:4001 → localnet.json
 scripts/localnet_listen.py            mock keeper + check() listen → listen.json

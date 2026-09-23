@@ -164,3 +164,19 @@ def test_pages_loads_due_json_without_flipping_to_testnet() -> None:
     assert "LOCALNET APP 1118" in html
     assert "due.json" in html
     assert str(LOCALNET.get("appId")) in html
+
+def test_probe_keeper_never_writes_deploy() -> None:
+    """Unsigned probe refreshes due.json only; never deploy.json / LocalNet leak."""
+    probe_path = ROOT / "scripts" / "probe_keeper.py"
+    assert probe_path.is_file()
+    src = probe_path.read_text()
+    assert "Never writes docs/deploy.json" in src
+    assert "OUT.write_text" in src
+    assert "DEPLOY_JSON.write" not in src
+    assert "mnemonic" in src.lower()
+    assert "769891898" in src
+    assert "deadmanAppId" in src
+    # Must not treat LocalNet app ids as TestNet deadman.
+    assert "1118" not in src
+    assert "BANK" in src
+
