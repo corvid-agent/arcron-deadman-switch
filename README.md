@@ -61,10 +61,10 @@ Reproducible: `python scripts/probe_keeper.py` (read-only; never writes
 `docs/deploy.json`; never prints a mnemonic; refuses if keeper address equals
 the TestNet bank).
 
-This pass (2026-09-23 ~4:09 PM MT): dockerd/LocalNet still down → no recreate.
+This pass (2026-09-24 ~3:59 PM MT): dockerd/LocalNet still down → no recreate.
 Ran `python scripts/probe_keeper.py` → refreshed `docs/due.json` from live
 unsigned TestNet algod+indexer reads of keeper `769891898` (thawed/frozen=0,
-`nextUpkeepId` 121, lastRound in due.json, `deadmanAppId`/`deadmanUpkeepId` stay 0).
+`nextUpkeepId` 121, lastRound 67629949, `deadmanAppId`/`deadmanUpkeepId` stay 0).
 CRT still footnotes LocalNet proof **app 1118** / mock **1119**; badge stays
 **LOCALNET** (not TestNet). Did not spend TestNet bank. Did not touch upkeep 81 or 87.
 

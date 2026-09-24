@@ -5,13 +5,13 @@
   "indexer": "https://testnet-idx.algonode.cloud",
   "keeperAppId": 769891898,
   "keeperAddress": "M4YFP33L5VIFRF53X53WUMQWBOWSLYQNBSSAJV2SORGF43L36XBY7OREUA",
-  "keeperBalanceMicroAlgos": 17090305,
+  "keeperBalanceMicroAlgos": 15390112,
   "keeperMinBalance": 2745200,
   "frozen": 0,
   "nextUpkeepId": 121,
   "createdAtRound": 66668923,
   "creator": "E5M2OH5XNDMNABJ6VOFOUVR2IKRPCGQH43PVC5P3DWQQ2LV2VJV2FJZQ3E",
-  "lastRound": 67598130,
+  "lastRound": 67629949,
   "deadmanAppId": 0,
   "deadmanUpkeepId": 0,
   "skipped": [
@@ -24,7 +24,7 @@
       "reason": "do not poke"
     }
   ],
-  "probedAt": "2026-09-23T22:09:50.710Z",
+  "probedAt": "2026-09-24T21:59:30.105Z",
   "source": "unsigned TestNet algod+indexer read",
-  "notes": "Deadman still undeployed (docs/deploy.json appId 0). Keeper 769891898 live on TestNet (frozen=0, next_upkeep_id=121, last-round=67598130). LocalNet proof stays in localnet.json + listen.json only \u2014 never copy those ids into deploy.json. Did not spend TestNet bank. Skipped upkeep 81. Did not poke 87. dockerd/LocalNet was down this pass so no recreate."
+  "notes": "Deadman still undeployed (docs/deploy.json appId 0). Keeper 769891898 live on TestNet (frozen=0, next_upkeep_id=121, last-round=67629949). LocalNet proof stays in localnet.json + listen.json only \u2014 never copy those ids into deploy.json. Did not spend TestNet bank. Skipped upkeep 81. Did not poke 87. dockerd/LocalNet was down this pass so no recreate."
 }
